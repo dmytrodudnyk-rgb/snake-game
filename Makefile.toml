@@ -24,6 +24,7 @@ args = ["run"]
 
 [tasks.run.env]
 LIBRARY_PATH = { value = "/opt/homebrew/lib:${LIBRARY_PATH}", condition = { platforms = ["mac"] } }
+PATH = { value = "${CARGO_MAKE_WORKING_DIRECTORY}/third-party/vcpkg/installed/x64-windows/bin;${PATH}", condition = { platforms = ["windows"] } }
 
 [tasks.clean]
 description = "Clean build artifacts"

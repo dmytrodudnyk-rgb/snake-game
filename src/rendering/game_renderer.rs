@@ -16,15 +16,16 @@ pub struct GameRenderer {
 }
 
 impl GameRenderer {
-    pub fn new(config: &Config) -> Self {
+    pub fn new(config: &Config) -> Result<Self, String> {
         let cell_size = config.visual.window_width / config.gameplay.grid_size;
-        GameRenderer {
-            text_renderer: TextRenderer::new(config.visual.window_width),
+        let text_renderer = TextRenderer::new(16)?;
+        Ok(GameRenderer {
+            text_renderer,
             cell_size,
             grid_size: config.gameplay.grid_size,
             window_width: config.visual.window_width,
             window_height: config.visual.window_height,
-        }
+        })
     }
 
     pub fn render_game(&self, canvas: &mut Canvas<Window>, game: &GameState) {
@@ -49,47 +50,47 @@ impl GameRenderer {
             10,
             10,
             colors::TEXT,
-        );
+        ).ok();
 
         if game.paused {
             self.text_renderer.draw_text_centered(
                 canvas,
                 "PAUSED",
-                self.window_width / 2,
-                self.window_height / 2,
+                (self.window_width / 2) as i32,
+                (self.window_height / 2) as i32,
                 colors::TEXT,
-            );
+            ).ok();
             self.text_renderer.draw_text_centered(
                 canvas,
                 "[ESC] Resume",
-                self.window_width / 2,
-                self.window_height / 2 + 40,
+                (self.window_width / 2) as i32,
+                (self.window_height / 2 + 40) as i32,
                 colors::TEXT_DIM,
-            );
+            ).ok();
         }
 
         if game.game_over {
             self.text_renderer.draw_text_centered(
                 canvas,
                 "GAME OVER",
-                self.window_width / 2,
-                self.window_height / 2 - 40,
+                (self.window_width / 2) as i32,
+                (self.window_height / 2 - 40) as i32,
                 colors::TEXT,
-            );
+            ).ok();
             self.text_renderer.draw_text_centered(
                 canvas,
                 &format!("Final Score: {}", game.score),
-                self.window_width / 2,
-                self.window_height / 2,
+                (self.window_width / 2) as i32,
+                (self.window_height / 2) as i32,
                 colors::TEXT,
-            );
+            ).ok();
             self.text_renderer.draw_text_centered(
                 canvas,
                 "[ESC] Menu | [Enter] Restart",
-                self.window_width / 2,
-                self.window_height / 2 + 40,
+                (self.window_width / 2) as i32,
+                (self.window_height / 2 + 40) as i32,
                 colors::TEXT_DIM,
-            );
+            ).ok();
         }
 
         canvas.present();
@@ -103,10 +104,10 @@ impl GameRenderer {
         self.text_renderer.draw_text_centered(
             canvas,
             "LEADERBOARD",
-            self.window_width / 2,
+            (self.window_width / 2) as i32,
             100,
             colors::TEXT,
-        );
+        ).ok();
 
         // Entries
         let start_y = 200;
@@ -116,10 +117,10 @@ impl GameRenderer {
             self.text_renderer.draw_text_centered(
                 canvas,
                 "No scores yet!",
-                self.window_width / 2,
-                start_y + 100,
+                (self.window_width / 2) as i32,
+                (start_y + 100) as i32,
                 colors::TEXT_DIM,
-            );
+            ).ok();
         } else {
             for (i, entry) in state.leaderboard.entries.iter().enumerate() {
                 let y = start_y + (i as u32 * spacing);
@@ -127,10 +128,10 @@ impl GameRenderer {
                 self.text_renderer.draw_text_centered(
                     canvas,
                     &text,
-                    self.window_width / 2,
-                    y,
+                    (self.window_width / 2) as i32,
+                    y as i32,
                     colors::TEXT,
-                );
+                ).ok();
             }
         }
 
@@ -138,10 +139,10 @@ impl GameRenderer {
         self.text_renderer.draw_text_centered(
             canvas,
             "[ESC] Return",
-            self.window_width / 2,
-            self.window_height - 50,
+            (self.window_width / 2) as i32,
+            (self.window_height - 50) as i32,
             colors::TEXT_DIM,
-        );
+        ).ok();
 
         canvas.present();
     }

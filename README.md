@@ -31,15 +31,29 @@ sudo apt install libsdl2-dev
 ```
 
 #### Windows
-Install SDL2 using vcpkg:
-```powershell
-vcpkg install sdl2:x64-windows
+
+**Prerequisites:**
+- Rust installed via [rustup](https://rustup.rs/)
+- Git Bash users: Add `%USERPROFILE%\.cargo\bin` to your bash PATH, or use PowerShell/cmd instead
+
+**First-time setup:**
+
+1. Initialize vcpkg submodule:
+```bash
+git submodule update --init --recursive
 ```
 
-Then set the environment variable (adjust path as needed):
-```powershell
-$env:SDL2_LIB_DIR = "C:\vcpkg\installed\x64-windows\lib"
+2. Bootstrap vcpkg:
+```bash
+./third-party/vcpkg/bootstrap-vcpkg.bat
 ```
+
+3. Install SDL2:
+```bash
+./third-party/vcpkg/vcpkg install sdl2:x64-windows
+```
+
+**No manual environment variables needed** - `.cargo/config.toml` and `Makefile.toml` handle SDL2 paths automatically.
 
 ### cargo-make (optional but recommended)
 

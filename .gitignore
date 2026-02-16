@@ -47,3 +47,8 @@ Desktop.ini
 # Test coverage
 *.profraw
 *.profdata
+
+# vcpkg artifacts
+/third-party/vcpkg/buildtrees/
+/third-party/vcpkg/downloads/
+/third-party/vcpkg/packages/

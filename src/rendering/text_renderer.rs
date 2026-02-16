@@ -1,49 +1,75 @@
+use crate::resources;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
+use sdl2::ttf::Font;
 use sdl2::video::Window;
 
-/// Placeholder text renderer using colored rectangles
-/// TODO: Replace with SDL2_ttf in Phase 2
+/// Text renderer using SDL2_ttf for real text rendering
 pub struct TextRenderer {
-    window_width: u32,
+    font: Font<'static, 'static>,
 }
 
 impl TextRenderer {
-    pub fn new(window_width: u32) -> Self {
-        TextRenderer { window_width }
+    /// Creates a new TextRenderer with the specified font size
+    pub fn new(font_size: u16) -> Result<Self, String> {
+        let font = resources::load_main_font(font_size)?;
+        Ok(TextRenderer { font })
     }
 
+    /// Draws text at the specified position
     pub fn draw_text(
         &self,
         canvas: &mut Canvas<Window>,
         text: &str,
-        x: u32,
-        y: u32,
+        x: i32,
+        y: i32,
         color: Color,
-    ) {
-        canvas.set_draw_color(color);
-        // Placeholder: draw rectangle representing text
+    ) -> Result<(), String> {
+        // Render text to surface
+        let surface = self
+            .font
+            .render(text)
+            .blended(color)
+            .map_err(|e| format!("Failed to render text: {}", e))?;
+
+        // Convert surface to texture
+        let texture_creator = canvas.texture_creator();
+        let texture = texture_creator
+            .create_texture_from_surface(&surface)
+            .map_err(|e| format!("Failed to create texture: {}", e))?;
+
+        // Get texture dimensions
+        let query = texture.query();
+        let target = Rect::new(x, y, query.width, query.height);
+
+        // Draw texture to canvas
         canvas
-            .fill_rect(Rect::new(
-                x as i32,
-                y as i32,
-                (text.len() as u32 * 8).min(self.window_width - x),
-                20,
-            ))
-            .ok();
+            .copy(&texture, None, Some(target))
+            .map_err(|e| format!("Failed to copy texture: {}", e))?;
+
+        Ok(())
     }
 
+    /// Draws text centered at the specified position
     pub fn draw_text_centered(
         &self,
         canvas: &mut Canvas<Window>,
         text: &str,
-        x: u32,
-        y: u32,
+        x: i32,
+        y: i32,
         color: Color,
-    ) {
-        let text_width = text.len() as u32 * 8; // Rough estimate
-        let text_x = x.saturating_sub(text_width / 2);
-        self.draw_text(canvas, text, text_x, y, color);
+    ) -> Result<(), String> {
+        // Get text dimensions
+        let (text_width, _) = self
+            .font
+            .size_of(text)
+            .map_err(|e| format!("Failed to get text size: {}", e))?;
+
+        // Calculate centered x position
+        let text_x = x - (text_width as i32 / 2);
+
+        // Draw text
+        self.draw_text(canvas, text, text_x, y, color)
     }
 }

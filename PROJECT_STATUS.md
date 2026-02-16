@@ -68,8 +68,18 @@
 - [x] README.md with installation instructions
 - [x] TODO.md for future enhancements
 
+### Windows Build Environment (COMPLETED)
+- [x] **vcpkg as git submodule** - `third-party/vcpkg/` with SDL2 installed
+- [x] **Automated dependency management** - No manual environment variables needed
+- [x] **.cargo/config.toml** - Windows-specific linker paths configured
+- [x] **Makefile.toml updated** - Windows PATH handling for SDL2.dll at runtime
+- [x] **.gitignore updated** - vcpkg build artifacts excluded
+- [x] **README.md updated** - Complete Windows setup instructions with vcpkg submodule
+- [x] **Build verified** - `cargo make build` works out of the box
+- [x] **Runtime verified** - `cargo make run` launches game successfully
+
 ### Current State
-- Game builds and runs successfully
+- Game builds and runs successfully on both macOS and Windows
 - All core gameplay functional
 - Visual rendering uses placeholder rectangles for text
 - Audio system stubbed (prints to console)
@@ -77,7 +87,44 @@
 
 ---
 
-## 🚧 IN PROGRESS - Phase 2
+---
+
+## ✅ COMPLETED - Windows Platform Setup (2026-02-16)
+
+### Objective
+Set up Windows development environment with vcpkg as a git submodule for consistent cross-platform builds.
+
+### What Was Done
+1. **vcpkg Integration:**
+   - Added vcpkg as git submodule at `third-party/vcpkg/`
+   - Bootstrapped vcpkg on Windows
+   - Installed SDL2 via vcpkg: `sdl2:x64-windows@2.32.10`
+
+2. **Build Configuration:**
+   - Created `.cargo/config.toml` with Windows MSVC linker search paths
+   - Updated `Makefile.toml` to auto-configure SDL2.dll PATH on Windows
+   - No manual environment variables required
+
+3. **Documentation:**
+   - Updated `README.md` with complete vcpkg submodule setup instructions
+   - Added `.gitignore` entries for vcpkg build artifacts
+   - Clarified Windows shell requirements (PowerShell/cmd/Git Bash)
+
+4. **Verification:**
+   - Installed cargo-make on Windows
+   - Build successful: `cargo make build`
+   - Runtime successful: `cargo make run`
+
+### Files Modified
+- `.gitignore` - Added vcpkg artifacts
+- `.cargo/config.toml` - Created with Windows SDL2 paths
+- `Makefile.toml` - Added Windows PATH configuration
+- `README.md` - Updated Windows prerequisites section
+- `PROJECT_STATUS.md` - This file
+
+---
+
+## 🚧 TODO - Phase 2
 
 ### Required Tasks
 
@@ -143,14 +190,19 @@ See `TODO.md` for details.
 
 ## 🎯 Next Steps
 
-**Immediate:** Start Phase 2
+**Status:** Windows setup complete. Ready to begin Phase 2.
+
+**Phase 2 Tasks (6-9 hours):**
 1. SDL2_ttf integration + font rendering
 2. SDL2_mixer integration + sound effects
 3. Smooth snake movement interpolation
 4. Food pulse animation
 5. Name input UI for leaderboard
 
-**Estimated Time:** 6-9 hours of focused work
+**Before Starting Phase 2:**
+- Commit Windows setup work
+- Relaunch IDE to refresh cargo PATH
+- Continue from updated PROJECT_STATUS.md
 
 ---
 
@@ -167,6 +219,25 @@ Create `assets/fonts/` and `assets/sounds/` directories.
 
 ## Build & Run
 
+### Prerequisites
+- Rust (via rustup)
+- cargo-make (`cargo install cargo-make`)
+
+### macOS
+SDL2 via Homebrew:
+```bash
+brew install sdl2
+```
+
+### Windows
+vcpkg submodule setup (one-time):
+```bash
+git submodule update --init --recursive
+./third-party/vcpkg/bootstrap-vcpkg.bat
+./third-party/vcpkg/vcpkg install sdl2:x64-windows
+```
+
+### All Platforms
 ```bash
 # Build
 cargo make build
@@ -178,10 +249,7 @@ cargo make run
 cargo make clean
 ```
 
-**Prerequisites:**
-- Rust (via rustup)
-- SDL2 (via Homebrew on macOS, vcpkg on Windows)
-- cargo-make (`cargo install cargo-make`)
+**No manual environment variables needed** - paths configured automatically via `.cargo/config.toml` and `Makefile.toml`.
 
 ---
 
@@ -189,8 +257,17 @@ cargo make clean
 
 - **GitHub:** https://github.com/dmytrodudnyk-rgb/snake-game
 - **Branch:** master
-- **Latest Commit:** Phase 1 complete (1d5b9d1)
+- **Latest Commit (macOS):** Phase 1 complete (ae284f5)
+- **Platform:** Windows 10 Pro (build environment active)
 
 ---
 
-*Last Updated: Phase 1 complete, ready for Phase 2*
+## Session Notes
+
+**Current Platform:** Windows
+**Development Started:** macOS → transitioned to Windows (2026-02-16)
+**Windows Setup:** ✅ Complete - vcpkg submodule configured, build verified
+
+---
+
+*Last Updated: 2026-02-16 - Windows build environment setup complete, ready for Phase 2*

@@ -10,12 +10,13 @@ pub struct MenuRenderer {
 }
 
 impl MenuRenderer {
-    pub fn new(window_width: u32, window_height: u32) -> Self {
-        MenuRenderer {
-            text_renderer: TextRenderer::new(window_width),
+    pub fn new(window_width: u32, window_height: u32) -> Result<Self, String> {
+        let text_renderer = TextRenderer::new(16)?;
+        Ok(MenuRenderer {
+            text_renderer,
             window_width,
             window_height,
-        }
+        })
     }
 
     pub fn render(&self, canvas: &mut Canvas<Window>, menu: &MenuState) {
@@ -26,10 +27,10 @@ impl MenuRenderer {
         self.text_renderer.draw_text_centered(
             canvas,
             "NEON SNAKE",
-            self.window_width / 2,
-            self.window_height / 4,
+            (self.window_width / 2) as i32,
+            (self.window_height / 4) as i32,
             colors::TEXT,
-        );
+        ).ok();
 
         // Menu items
         let items = MenuState::get_items();
@@ -60,20 +61,20 @@ impl MenuRenderer {
             self.text_renderer.draw_text_centered(
                 canvas,
                 &display_text,
-                self.window_width / 2,
-                y,
+                (self.window_width / 2) as i32,
+                y as i32,
                 color,
-            );
+            ).ok();
         }
 
         // Controls hint
         self.text_renderer.draw_text_centered(
             canvas,
             "[Arrow Keys / D-Pad] Navigate | [Enter / A] Select | [ESC] Exit",
-            self.window_width / 2,
-            self.window_height - 50,
+            (self.window_width / 2) as i32,
+            (self.window_height - 50) as i32,
             colors::TEXT_DIM,
-        );
+        ).ok();
 
         canvas.present();
     }

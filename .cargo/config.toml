@@ -1,0 +1,11 @@
+# Cargo configuration for cross-platform SDL2 builds
+
+[target.x86_64-pc-windows-msvc]
+rustflags = [
+    "-L", "third-party/vcpkg/installed/x64-windows/lib",
+]
+
+[env]
+# Windows: Point to vcpkg SDL2
+SDL2_LIB_DIR = { value = "third-party/vcpkg/installed/x64-windows/lib", condition = { platform = "windows" } }
+SDL2_INCLUDE_PATH = { value = "third-party/vcpkg/installed/x64-windows/include", condition = { platform = "windows" } }

@@ -66,8 +66,8 @@ impl App {
         let menu_renderer = MenuRenderer::new(
             config.visual.window_width,
             config.visual.window_height,
-        );
-        let game_renderer = GameRenderer::new(&config);
+        )?;
+        let game_renderer = GameRenderer::new(&config)?;
 
         // Initialize states
         let app_state = AppState::MainMenu;
