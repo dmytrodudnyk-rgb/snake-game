@@ -2,10 +2,6 @@
 /target/
 Cargo.lock
 
-# External tooling
-_bmad/
-.claude/
-
 # IDE / Editor
 .vscode/
 .idea/
