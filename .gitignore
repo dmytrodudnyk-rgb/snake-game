@@ -1,0 +1,53 @@
+# Rust
+/target/
+Cargo.lock
+
+# External tooling
+_bmad/
+.claude/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Game data
+leaderboard.json
+
+# Logs and temp files
+*.log
+*.tmp
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# Backup files
+*.bak
+*.backup
+
+# cargo-make
+.makers/
+
+# Test coverage
+*.profraw
+*.profdata

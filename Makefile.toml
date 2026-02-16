@@ -1,0 +1,46 @@
+[config]
+default_to_workspace = false
+
+[tasks.build]
+description = "Build the snake game"
+command = "cargo"
+args = ["build"]
+
+[tasks.build.env]
+LIBRARY_PATH = { value = "/opt/homebrew/lib:${LIBRARY_PATH}", condition = { platforms = ["mac"] } }
+
+[tasks.build-release]
+description = "Build the snake game in release mode"
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.build-release.env]
+LIBRARY_PATH = { value = "/opt/homebrew/lib:${LIBRARY_PATH}", condition = { platforms = ["mac"] } }
+
+[tasks.run]
+description = "Run the snake game"
+command = "cargo"
+args = ["run"]
+
+[tasks.run.env]
+LIBRARY_PATH = { value = "/opt/homebrew/lib:${LIBRARY_PATH}", condition = { platforms = ["mac"] } }
+
+[tasks.clean]
+description = "Clean build artifacts"
+command = "cargo"
+args = ["clean"]
+
+[tasks.check]
+description = "Check the project for errors"
+command = "cargo"
+args = ["check"]
+
+[tasks.format]
+description = "Format the code"
+command = "cargo"
+args = ["fmt"]
+
+[tasks.test]
+description = "Run tests"
+command = "cargo"
+args = ["test"]

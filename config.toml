@@ -1,0 +1,13 @@
+[gameplay]
+initial_speed_ms = 150        # Starting movement delay
+min_speed_ms = 50             # Maximum speed cap
+speed_increase_per_food = 5   # Speed increase in ms per food eaten
+grid_size = 30                # Grid dimensions (30x30 grid)
+
+[visual]
+window_width = 800            # Window width in pixels
+window_height = 800           # Window height in pixels
+grid_alpha = 0.15             # Grid line transparency (0.0 - 1.0)
+
+[audio]
+master_volume = 0.7           # Master volume (0.0 - 1.0)
