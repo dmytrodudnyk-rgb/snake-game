@@ -1,273 +1,191 @@
 # Neon Snake - Project Status
 
-## Project Overview
-
-**Goal:** Build a classic snake game as a pet project with neon retro pixel art aesthetics.
-
-**Tech Stack:** Rust + SDL2, cross-platform (macOS/Windows/Linux), native desktop app.
+**Last Updated:** 2026-02-16
+**Current Platform:** Windows 10 Pro
+**Session Status:** Phase 2 - 3 of 5 tasks complete
 
 ---
 
-## Initial Requirements
+## Quick Summary
 
-- Native desktop app (no web)
-- Simple graphics (no heavy engines like Unity/Unreal)
-- Cross-platform: Windows + macOS
-- Classic snake gameplay
-- Main menu with Start/Leaderboard/Exit
-- Local leaderboard (top 5 scores)
-- Configurable game speed progression
-- Keyboard + gamepad support
-- Neon retro pixel art visual style
-- Grid-based movement with smooth interpolation
-- Sound effects (crunch on food eat, click on menu)
+A classic snake game built with Rust + SDL2, featuring neon retro pixel art aesthetics. Cross-platform (Windows/macOS). Phase 1 complete, Phase 2 in progress.
+
+**Tech Stack:** Rust, SDL2, SDL2_ttf, cargo-make
+**Repository:** https://github.com/dmytrodudnyk-rgb/snake-game
+**Branch:** master (2 commits ahead of origin)
+
+---
+
+## ✅ What's Working
+
+### Core Game (Phase 1 - Complete)
+- Full snake gameplay with grid-based movement
+- Food spawning, collision detection (walls, self)
+- Score tracking with configurable speed progression
+- Main menu with keyboard/gamepad navigation
+- Local leaderboard (top 5 scores, JSON persistence)
+- Pause functionality (ESC)
 - Input buffering for responsive controls
 
----
+### Visual & Polish (Phase 2 - Partial)
+- ✅ **SDL2_ttf text rendering** - Press Start 2P font @ 16pt
+  - Menu, game HUD, leaderboard all render real text
+  - Singleton resource manager (no lifetime cascading)
+- ✅ **Smooth snake movement** - Head interpolates between grid cells at 60 FPS
+  - Linear interpolation without cloning (calculates previous position)
+  - Body segments stay on grid
+- ✅ **Food pulse animation** - Sine wave scaling (0.9x to 1.1x, 1 sec loop)
 
-## ✅ COMPLETED - Phase 1
-
-### Core Functionality
-- [x] SDL2 setup with cross-platform build system
-- [x] cargo-make task runner (works on all platforms)
-- [x] System SDL2 (Homebrew on macOS, vcpkg on Windows)
-- [x] Latest dependencies (SDL2 0.38, rand 0.10, toml 1.0)
-- [x] Main menu with keyboard/gamepad navigation
-- [x] Core game loop and state machine (MainMenu/Playing/Leaderboard)
-- [x] Snake movement with grid-based logic
-- [x] Food spawning and collision detection
-- [x] Wall and self-collision
-- [x] Score tracking
-- [x] Configurable speed progression (config.toml)
-- [x] Local leaderboard persistence (JSON)
-- [x] Input buffering (1 input queue for responsive controls)
-- [x] Pause functionality (ESC)
-- [x] Game over + restart flow
-
-### Architecture (Refactored)
-- [x] **Modular rendering system:**
-  - `rendering/colors.rs` - Color constants
-  - `rendering/text_renderer.rs` - Text rendering (placeholder, ready for SDL2_ttf)
-  - `rendering/menu_renderer.rs` - Menu rendering
-  - `rendering/game_renderer.rs` - Game + leaderboard rendering
-- [x] **Clean separation:**
-  - `main.rs` - Entry point (20 lines)
-  - `app.rs` - SDL context + game loop
-  - `input_handler.rs` - Input mapping logic
-  - `game_state.rs` - Game logic
-  - `config.rs` - Configuration loading
-- [x] Grid rendering with semi-transparent lines
-- [x] Neon color palette implemented
-- [x] Snake segments with 2px gap (segmented look)
-
-### Infrastructure
-- [x] Git repository initialized
-- [x] GitHub remote configured (git@github.com:dmytrodudnyk-rgb/snake-game.git)
-- [x] SSH authentication configured (~/.ssh/id_ed25519_openvpn)
-- [x] Comprehensive .gitignore
-- [x] README.md with installation instructions
-- [x] TODO.md for future enhancements
-
-### Windows Build Environment (COMPLETED)
-- [x] **vcpkg as git submodule** - `third-party/vcpkg/` with SDL2 installed
-- [x] **Automated dependency management** - No manual environment variables needed
-- [x] **.cargo/config.toml** - Windows-specific linker paths configured
-- [x] **Makefile.toml updated** - Windows PATH handling for SDL2.dll at runtime
-- [x] **.gitignore updated** - vcpkg build artifacts excluded
-- [x] **README.md updated** - Complete Windows setup instructions with vcpkg submodule
-- [x] **Build verified** - `cargo make build` works out of the box
-- [x] **Runtime verified** - `cargo make run` launches game successfully
-
-### Current State
-- Game builds and runs successfully on both macOS and Windows
-- All core gameplay functional
-- Visual rendering uses placeholder rectangles for text
-- Audio system stubbed (prints to console)
-- Leaderboard uses hardcoded "PLAYER" name
+### Build System
+- **Windows:** vcpkg submodule with SDL2 + SDL2_ttf installed
+- **Cross-platform:** cargo-make task runner handles everything
+- **Zero manual config:** Automated linker paths and runtime DLL PATH
 
 ---
 
----
+## 🚧 What's Left - Phase 2
 
-## ✅ COMPLETED - Windows Platform Setup (2026-02-16)
+### Remaining Tasks (Estimated: 2-3 hours)
 
-### Objective
-Set up Windows development environment with vcpkg as a git submodule for consistent cross-platform builds.
+#### 1. Audio System (SDL2_mixer) - ~45 min
+**Status:** Not started
+**What to do:**
+- Install: `./third-party/vcpkg/vcpkg install sdl2-mixer:x64-windows`
+- Add `mixer` feature to Cargo.toml sdl2 dependency
+- Find/download sound files:
+  - `crunch.wav` - Food eaten (short, crisp)
+  - `click.wav` - Menu navigation (subtle UI sound)
+- Update `audio.rs` - replace print stubs with real SDL2_mixer calls
+- Create `assets/sounds/` directory for audio files
 
-### What Was Done
-1. **vcpkg Integration:**
-   - Added vcpkg as git submodule at `third-party/vcpkg/`
-   - Bootstrapped vcpkg on Windows
-   - Installed SDL2 via vcpkg: `sdl2:x64-windows@2.32.10`
+**Current state:** Audio stubs print "[Audio] Click" and "[Audio] Crunch"
 
-2. **Build Configuration:**
-   - Created `.cargo/config.toml` with Windows MSVC linker search paths
-   - Updated `Makefile.toml` to auto-configure SDL2.dll PATH on Windows
-   - No manual environment variables required
+#### 2. Name Input UI - ~1-2 hours
+**Status:** Not started
+**What to do:**
+- Create `name_input_state.rs` module
+- Implement text input handling (capture keystrokes)
+- Render input overlay with cursor blink animation
+- Integrate into game over flow when high score achieved
+- Character limit: 12 chars, alphanumeric + underscore
+- ESC to skip (defaults to "PLAYER"), Enter to confirm
 
-3. **Documentation:**
-   - Updated `README.md` with complete vcpkg submodule setup instructions
-   - Added `.gitignore` entries for vcpkg build artifacts
-   - Clarified Windows shell requirements (PowerShell/cmd/Git Bash)
-
-4. **Verification:**
-   - Installed cargo-make on Windows
-   - Build successful: `cargo make build`
-   - Runtime successful: `cargo make run`
-
-### Files Modified
-- `.gitignore` - Added vcpkg artifacts
-- `.cargo/config.toml` - Created with Windows SDL2 paths
-- `Makefile.toml` - Added Windows PATH configuration
-- `README.md` - Updated Windows prerequisites section
-- `PROJECT_STATUS.md` - This file
+**Current state:** Leaderboard hardcodes "PLAYER" name (app.rs:151)
 
 ---
 
-## 🚧 TODO - Phase 2
+## 📁 Project Structure
 
-### Required Tasks
-
-#### 1. Text Rendering (SDL2_ttf)
-- [ ] Add `sdl2-ttf` dependency to Cargo.toml
-- [ ] Install system SDL2_ttf library (brew/vcpkg)
-- [ ] Update Makefile.toml library paths
-- [ ] Find/download pixel font (Press Start 2P or similar)
-- [ ] Implement font loading in `text_renderer.rs`
-- [ ] Replace placeholder rectangles with real text rendering
-- [ ] Test on all UI screens (menu, game, leaderboard)
-
-#### 2. Audio System (SDL2_mixer)
-- [ ] Add `sdl2-mixer` dependency to Cargo.toml
-- [ ] Install system SDL2_mixer library (brew/vcpkg)
-- [ ] Find/download sound effects:
-  - `crunch.wav` - Food eaten sound
-  - `click.wav` - Menu navigation sound
-- [ ] Implement audio loading in `audio.rs`
-- [ ] Wire up audio calls (already stubbed)
-- [ ] Test audio playback
-
-#### 3. Smooth Movement Animation
-- [ ] Add interpolation state to GameState
-- [ ] Store previous position + interpolation timer
-- [ ] Render snake at interpolated position (linear interpolation over 100-150ms)
-- [ ] Maintain grid-based movement logic
-
-#### 4. Food Pulse Animation
-- [ ] Add animation timer to food rendering
-- [ ] Implement scale animation (0.9x to 1.1x, 1 second loop, sine wave)
-- [ ] Apply transform when rendering food
-
-#### 5. Name Input UI
-- [ ] Create `name_input_state.rs` for high score entry
-- [ ] Implement text input handling (capture keystrokes)
-- [ ] Add input overlay rendering in `game_renderer.rs`
-- [ ] Add cursor blink animation
-- [ ] Integrate into game over flow (when high score achieved)
-- [ ] Character limit: 12 chars max
-- [ ] Allowed characters: alphanumeric + underscore
-- [ ] ESC to skip (defaults to "PLAYER"), Enter to confirm
-- [ ] Test full flow: game over → name input → leaderboard
-
-### Optional Enhancements
-- [ ] Particle effects on food consumption (3-5 particles burst)
-- [ ] Screen flash effect on food eat
-- [ ] Menu transition animations
-
----
-
-## 📋 DEFERRED - Future Refactoring
-
-### Extract Game Logic from App
-**Priority:** Medium
-**Description:** `app.rs` currently contains both SDL/windowing lifecycle AND game loop logic. Should be separated:
-- **App struct** - SDL context, window, canvas, event pump, frame loop
-- **Game struct** (new) - Game state machine, all game states, update logic, timing
-
-See `TODO.md` for details.
-
----
-
-## 🎯 Next Steps
-
-**Status:** Windows setup complete. Ready to begin Phase 2.
-
-**Phase 2 Tasks (6-9 hours):**
-1. SDL2_ttf integration + font rendering
-2. SDL2_mixer integration + sound effects
-3. Smooth snake movement interpolation
-4. Food pulse animation
-5. Name input UI for leaderboard
-
-**Before Starting Phase 2:**
-- Commit Windows setup work
-- Relaunch IDE to refresh cargo PATH
-- Continue from updated PROJECT_STATUS.md
-
----
-
-## Assets Needed (Phase 2)
-
-- **Font:** Pixel/retro font (.ttf), e.g., Press Start 2P
-- **Sounds:**
-  - `crunch.wav` - Short, crisp food eat sound
-  - `click.wav` - Subtle UI click sound
-
-Create `assets/fonts/` and `assets/sounds/` directories.
-
----
-
-## Build & Run
-
-### Prerequisites
-- Rust (via rustup)
-- cargo-make (`cargo install cargo-make`)
-
-### macOS
-SDL2 via Homebrew:
-```bash
-brew install sdl2
+```
+snake-game/
+├── src/
+│   ├── main.rs              # Entry point + TTF init
+│   ├── app.rs               # SDL context + game loop
+│   ├── resources.rs         # Singleton TTF context manager
+│   ├── game_state.rs        # Game logic + interpolation
+│   ├── rendering/
+│   │   ├── text_renderer.rs # SDL2_ttf text rendering
+│   │   ├── game_renderer.rs # Game + leaderboard rendering
+│   │   └── menu_renderer.rs # Main menu rendering
+│   ├── audio.rs             # Audio stubs (needs SDL2_mixer)
+│   └── ...
+├── third-party/
+│   ├── fonts/
+│   │   └── PressStart2P.ttf # Retro pixel font (SIL OFL)
+│   └── vcpkg/               # Git submodule with SDL2 + SDL2_ttf
+├── .cargo/config.toml       # Windows MSVC linker paths
+├── Makefile.toml            # cargo-make build tasks
+└── config.toml              # Game configuration
 ```
 
-### Windows
-vcpkg submodule setup (one-time):
+---
+
+## 🔧 Build & Run
+
+**Prerequisites:**
+- Rust (rustup)
+- cargo-make: `cargo install cargo-make`
+
+**Windows (first-time setup):**
 ```bash
 git submodule update --init --recursive
 ./third-party/vcpkg/bootstrap-vcpkg.bat
-./third-party/vcpkg/vcpkg install sdl2:x64-windows
+./third-party/vcpkg/vcpkg install sdl2:x64-windows sdl2-ttf:x64-windows
 ```
 
-### All Platforms
+**All platforms:**
 ```bash
-# Build
-cargo make build
-
-# Run
-cargo make run
-
-# Clean
-cargo make clean
+cargo make build  # Compile
+cargo make run    # Launch game
 ```
 
-**No manual environment variables needed** - paths configured automatically via `.cargo/config.toml` and `Makefile.toml`.
+**No manual environment variables needed** - automated via .cargo/config.toml and Makefile.toml.
 
 ---
 
-## Repository
+## 🎯 Next Session - Quick Start
 
-- **GitHub:** https://github.com/dmytrodudnyk-rgb/snake-game
-- **Branch:** master
-- **Latest Commit (macOS):** Phase 1 complete (ae284f5)
-- **Platform:** Windows 10 Pro (build environment active)
+### Option A: Ship Audio (Fastest)
+1. Install SDL2_mixer via vcpkg
+2. Find free .wav sound files (freesound.org, OpenGameArt)
+3. Update audio.rs to use SDL2_mixer
+4. Test in-game sounds
+5. **Result:** Game feels complete with audio feedback
+
+### Option B: Build Name Input UI (More Complex)
+1. Create name_input_state.rs module
+2. Implement keyboard text input handling
+3. Build UI overlay rendering
+4. Wire into game over flow
+5. **Result:** Leaderboard shows real player names
+
+**Recommendation:** Start with audio (quick win), then tackle name input.
 
 ---
 
-## Session Notes
+## 📝 Recent Commits
 
-**Current Platform:** Windows
-**Development Started:** macOS → transitioned to Windows (2026-02-16)
-**Windows Setup:** ✅ Complete - vcpkg submodule configured, build verified
+```
+c9472e7 Add smooth movement and food pulse animations - Phase 2 animations complete
+3eb0351 Add SDL2_ttf text rendering - Phase 2 text rendering complete
+ae284f5 Add project status summary and include BMAD tooling
+```
+
+**Branch status:** 2 commits ahead of origin/master (not pushed yet)
 
 ---
 
-*Last Updated: 2026-02-16 - Windows build environment setup complete, ready for Phase 2*
+## 🎮 Controls
+
+**Keyboard:**
+- Arrow Keys: Navigate menu / Move snake
+- Enter: Select / Restart
+- ESC: Pause / Back to menu / Exit
+
+**Gamepad:**
+- D-Pad: Navigate / Move
+- A Button: Select / Restart
+- Start: Pause
+
+---
+
+## 💡 Design Decisions
+
+### Why Singleton for TTF Context?
+Avoids cascading lifetimes through App → Renderers → TextRenderer. Using `once_cell` with `'static` fonts keeps code clean.
+
+### Why No Snake Cloning for Interpolation?
+Only the head needs interpolation. Previous position calculated from current position + direction. Zero allocation overhead.
+
+### Why Sine Wave for Pulse?
+TAU (2π) creates smooth continuous animation. Scale range 0.9-1.1 keeps food recognizable while adding visual interest.
+
+---
+
+## 🐛 Known Issues
+
+None currently blocking. Audio and name input are planned features, not bugs.
+
+---
+
+*Ready to pick up Phase 2 tasks tomorrow. Start with audio for quick progress, or dive into name input UI for the full feature set.*
