@@ -138,6 +138,9 @@ impl App {
                 let now = Instant::now();
                 let elapsed = now.duration_since(self.last_update);
 
+                // Update interpolation progress for smooth movement
+                self.game_state.update_interpolation(elapsed.as_millis() as u64);
+
                 if elapsed >= Duration::from_millis(self.game_state.current_speed_ms as u64) {
                     let food_eaten = self.game_state.update();
                     if food_eaten {

@@ -6,6 +6,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
+use std::time::Instant;
 
 pub struct GameRenderer {
     text_renderer: TextRenderer,
@@ -13,6 +14,7 @@ pub struct GameRenderer {
     grid_size: u32,
     window_width: u32,
     window_height: u32,
+    animation_start: Instant,
 }
 
 impl GameRenderer {
@@ -25,6 +27,7 @@ impl GameRenderer {
             grid_size: config.gameplay.grid_size,
             window_width: config.visual.window_width,
             window_height: config.visual.window_height,
+            animation_start: Instant::now(),
         })
     }
 
@@ -35,12 +38,19 @@ impl GameRenderer {
         // Draw grid lines
         self.draw_grid(canvas);
 
-        // Draw food
-        self.draw_cell(canvas, &game.food, colors::FOOD);
+        // Draw food with pulse animation
+        self.draw_cell_pulsing(canvas, &game.food, colors::FOOD);
 
-        // Draw snake
-        for segment in game.snake.iter() {
-            self.draw_cell(canvas, segment, colors::SNAKE);
+        // Draw snake with interpolation
+        if !game.snake.is_empty() {
+            // Draw body segments at grid positions (skip the head)
+            for segment in game.snake.iter().skip(1) {
+                self.draw_cell(canvas, segment, colors::SNAKE);
+            }
+
+            // Draw head with interpolation for smooth movement
+            let (interp_x, interp_y) = game.get_interpolated_head();
+            self.draw_cell_interpolated(canvas, interp_x, interp_y, colors::SNAKE);
         }
 
         // Draw score
@@ -181,6 +191,52 @@ impl GameRenderer {
                 y + padding,
                 size - (padding * 2) as u32,
                 size - (padding * 2) as u32,
+            ))
+            .ok();
+    }
+
+    fn draw_cell_interpolated(&self, canvas: &mut Canvas<Window>, grid_x: f32, grid_y: f32, color: Color) {
+        canvas.set_draw_color(color);
+        let x = (grid_x * self.cell_size as f32) as i32;
+        let y = (grid_y * self.cell_size as f32) as i32;
+        let size = self.cell_size as u32;
+
+        // Draw with small padding for segmented look
+        let padding = 2;
+        canvas
+            .fill_rect(Rect::new(
+                x + padding,
+                y + padding,
+                size - (padding * 2) as u32,
+                size - (padding * 2) as u32,
+            ))
+            .ok();
+    }
+
+    fn draw_cell_pulsing(&self, canvas: &mut Canvas<Window>, pos: &Position, color: Color) {
+        canvas.set_draw_color(color);
+
+        // Calculate pulse scale using sine wave (1 second period)
+        let elapsed = self.animation_start.elapsed().as_secs_f32();
+        let pulse_factor = (elapsed * std::f32::consts::TAU).sin(); // TAU = 2π
+        let scale = 1.0 + (pulse_factor * 0.1); // Range: 0.9 to 1.1
+
+        // Calculate scaled size and centered position
+        let base_size = self.cell_size as f32;
+        let scaled_size = (base_size * scale) as u32;
+        let size_diff = (base_size - scaled_size as f32) / 2.0;
+
+        let x = (pos.x as f32 * base_size + size_diff) as i32;
+        let y = (pos.y as f32 * base_size + size_diff) as i32;
+
+        // Draw with small padding for segmented look
+        let padding = 2;
+        canvas
+            .fill_rect(Rect::new(
+                x + padding,
+                y + padding,
+                scaled_size.saturating_sub((padding * 2) as u32),
+                scaled_size.saturating_sub((padding * 2) as u32),
             ))
             .ok();
     }

@@ -36,6 +36,7 @@ pub struct GameState {
     pub game_over: bool,
     pub paused: bool,
     pub current_speed_ms: u32,
+    pub interpolation_progress: f32, // 0.0 to 1.0 for smooth movement animation
     grid_size: u32,
     config: Config,
 }
@@ -59,6 +60,7 @@ impl GameState {
             game_over: false,
             paused: false,
             current_speed_ms: config.gameplay.initial_speed_ms,
+            interpolation_progress: 0.0,
             grid_size,
             config,
         };
@@ -81,6 +83,7 @@ impl GameState {
         self.game_over = false;
         self.paused = false;
         self.current_speed_ms = self.config.gameplay.initial_speed_ms;
+        self.interpolation_progress = 0.0;
         self.spawn_food();
     }
 
@@ -98,6 +101,9 @@ impl GameState {
         if self.game_over || self.paused {
             return false;
         }
+
+        // Reset interpolation for new movement step
+        self.interpolation_progress = 0.0;
 
         // Apply buffered input
         if let Some(next_dir) = self.next_direction.take() {
@@ -166,5 +172,35 @@ impl GameState {
 
     pub fn toggle_pause(&mut self) {
         self.paused = !self.paused;
+    }
+
+    /// Update interpolation progress for smooth movement animation
+    pub fn update_interpolation(&mut self, elapsed_ms: u64) {
+        if !self.game_over && !self.paused {
+            self.interpolation_progress = (elapsed_ms as f32 / self.current_speed_ms as f32).min(1.0);
+        }
+    }
+
+    /// Get interpolated head position for smooth rendering
+    pub fn get_interpolated_head(&self) -> (f32, f32) {
+        if self.snake.is_empty() {
+            return (0.0, 0.0);
+        }
+
+        let current_head = self.snake.front().unwrap();
+
+        // Calculate previous head position based on direction
+        let (prev_x, prev_y) = match self.direction {
+            Direction::Up => (current_head.x, current_head.y + 1),
+            Direction::Down => (current_head.x, current_head.y - 1),
+            Direction::Left => (current_head.x + 1, current_head.y),
+            Direction::Right => (current_head.x - 1, current_head.y),
+        };
+
+        // Linear interpolation
+        let interp_x = prev_x as f32 + (current_head.x - prev_x) as f32 * self.interpolation_progress;
+        let interp_y = prev_y as f32 + (current_head.y - prev_y) as f32 * self.interpolation_progress;
+
+        (interp_x, interp_y)
     }
 }
