@@ -45,3 +45,62 @@ args = ["fmt"]
 description = "Run tests"
 command = "cargo"
 args = ["test"]
+
+[tasks.dist]
+description = "Build release and create distribution package"
+windows_alias = "dist-windows"
+
+[tasks.dist-windows]
+description = "Create Windows distribution package with all dependencies"
+script = '''
+echo "Building release version..."
+cargo build --release
+
+echo "Creating distribution directory..."
+rm -rf dist
+mkdir -p dist
+
+echo "Copying executable..."
+cp target/release/snake-game.exe dist/
+
+echo "Copying configuration..."
+cp config.toml dist/
+
+echo "Copying assets..."
+cp -r assets dist/
+
+echo "Copying SDL2 runtime DLLs..."
+cp third-party/vcpkg/installed/x64-windows/bin/SDL2.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/SDL2_ttf.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/SDL2_mixer.dll dist/
+
+echo "Copying SDL2_ttf dependencies..."
+cp third-party/vcpkg/installed/x64-windows/bin/freetype.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/libpng16.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/zlib1.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/brotlicommon.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/brotlidec.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/bz2.dll dist/
+
+echo "Copying SDL2_mixer dependencies..."
+cp third-party/vcpkg/installed/x64-windows/bin/ogg.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/vorbis.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/vorbisenc.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/vorbisfile.dll dist/
+cp third-party/vcpkg/installed/x64-windows/bin/wavpackdll.dll dist/
+
+echo ""
+echo "✅ Distribution package created in dist/"
+echo "📦 Contents:"
+ls -lh dist/
+echo ""
+echo "Total size:"
+du -sh dist/
+'''
+
+[tasks.run-dist]
+description = "Run the distribution build"
+condition = { platforms = ["windows"], files_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/dist/snake-game.exe"] }
+script = '''
+cd dist && ./snake-game.exe
+'''
