@@ -1,4 +1,3 @@
-use crate::resources;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
@@ -6,29 +5,26 @@ use sdl2::ttf::Font;
 use sdl2::video::Window;
 
 /// Text renderer using SDL2_ttf for real text rendering
-pub struct TextRenderer {
-    font: Font<'static, 'static>,
-}
+pub struct TextRenderer;
 
 impl TextRenderer {
-    /// Creates a new TextRenderer with the specified font size
-    pub fn new(font_size: u16) -> Result<Self, String> {
-        let font = resources::load_main_font(font_size)?;
-        Ok(TextRenderer { font })
+    /// Creates a new TextRenderer
+    pub fn new() -> Self {
+        TextRenderer
     }
 
     /// Draws text at the specified position
     pub fn draw_text(
         &self,
         canvas: &mut Canvas<Window>,
+        font: &Font,
         text: &str,
         x: i32,
         y: i32,
         color: Color,
     ) -> Result<(), String> {
         // Render text to surface
-        let surface = self
-            .font
+        let surface = font
             .render(text)
             .blended(color)
             .map_err(|e| format!("Failed to render text: {}", e))?;
@@ -55,14 +51,14 @@ impl TextRenderer {
     pub fn draw_text_centered(
         &self,
         canvas: &mut Canvas<Window>,
+        font: &Font,
         text: &str,
         x: i32,
         y: i32,
         color: Color,
     ) -> Result<(), String> {
         // Get text dimensions
-        let (text_width, _) = self
-            .font
+        let (text_width, _) = font
             .size_of(text)
             .map_err(|e| format!("Failed to get text size: {}", e))?;
 
@@ -70,6 +66,6 @@ impl TextRenderer {
         let text_x = x - (text_width as i32 / 2);
 
         // Draw text
-        self.draw_text(canvas, text, text_x, y, color)
+        self.draw_text(canvas, font, text, text_x, y, color)
     }
 }

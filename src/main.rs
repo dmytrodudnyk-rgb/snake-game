@@ -1,6 +1,7 @@
 mod app;
 mod audio;
 mod config;
+mod fonts;
 mod game_state;
 mod input;
 mod input_handler;
@@ -14,9 +15,6 @@ use app::App;
 use config::Config;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize TTF subsystem
-    resources::init_ttf()?;
-
     let config = Config::load()?;
     let mut app = App::new(config)?;
     app.run();

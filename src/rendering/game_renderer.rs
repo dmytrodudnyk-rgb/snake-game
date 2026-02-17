@@ -5,6 +5,7 @@ use crate::rendering::{colors, text_renderer::TextRenderer};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
+use sdl2::ttf::Font;
 use sdl2::video::Window;
 use std::time::Instant;
 
@@ -18,20 +19,20 @@ pub struct GameRenderer {
 }
 
 impl GameRenderer {
-    pub fn new(config: &Config) -> Result<Self, String> {
+    pub fn new(config: &Config) -> Self {
         let cell_size = config.visual.window_width / config.gameplay.grid_size;
-        let text_renderer = TextRenderer::new(16)?;
-        Ok(GameRenderer {
+        let text_renderer = TextRenderer::new();
+        GameRenderer {
             text_renderer,
             cell_size,
             grid_size: config.gameplay.grid_size,
             window_width: config.visual.window_width,
             window_height: config.visual.window_height,
             animation_start: Instant::now(),
-        })
+        }
     }
 
-    pub fn render_game(&self, canvas: &mut Canvas<Window>, game: &GameState) {
+    pub fn render_game(&self, canvas: &mut Canvas<Window>, font: &Font, game: &GameState) {
         canvas.set_draw_color(colors::BACKGROUND);
         canvas.clear();
 
@@ -56,6 +57,7 @@ impl GameRenderer {
         // Draw score
         self.text_renderer.draw_text(
             canvas,
+            font,
             &format!("Score: {}", game.score),
             10,
             10,
@@ -65,6 +67,7 @@ impl GameRenderer {
         if game.paused {
             self.text_renderer.draw_text_centered(
                 canvas,
+                font,
                 "PAUSED",
                 (self.window_width / 2) as i32,
                 (self.window_height / 2) as i32,
@@ -72,6 +75,7 @@ impl GameRenderer {
             ).ok();
             self.text_renderer.draw_text_centered(
                 canvas,
+                font,
                 "[ESC] Resume",
                 (self.window_width / 2) as i32,
                 (self.window_height / 2 + 40) as i32,
@@ -82,6 +86,7 @@ impl GameRenderer {
         if game.game_over {
             self.text_renderer.draw_text_centered(
                 canvas,
+                font,
                 "GAME OVER",
                 (self.window_width / 2) as i32,
                 (self.window_height / 2 - 40) as i32,
@@ -89,6 +94,7 @@ impl GameRenderer {
             ).ok();
             self.text_renderer.draw_text_centered(
                 canvas,
+                font,
                 &format!("Final Score: {}", game.score),
                 (self.window_width / 2) as i32,
                 (self.window_height / 2) as i32,
@@ -96,6 +102,7 @@ impl GameRenderer {
             ).ok();
             self.text_renderer.draw_text_centered(
                 canvas,
+                font,
                 "[ESC] Menu | [Enter] Restart",
                 (self.window_width / 2) as i32,
                 (self.window_height / 2 + 40) as i32,
@@ -106,13 +113,14 @@ impl GameRenderer {
         canvas.present();
     }
 
-    pub fn render_leaderboard(&self, canvas: &mut Canvas<Window>, state: &LeaderboardState) {
+    pub fn render_leaderboard(&self, canvas: &mut Canvas<Window>, font: &Font, state: &LeaderboardState) {
         canvas.set_draw_color(colors::BACKGROUND);
         canvas.clear();
 
         // Title
         self.text_renderer.draw_text_centered(
             canvas,
+            font,
             "LEADERBOARD",
             (self.window_width / 2) as i32,
             100,
@@ -126,6 +134,7 @@ impl GameRenderer {
         if state.leaderboard.entries.is_empty() {
             self.text_renderer.draw_text_centered(
                 canvas,
+                font,
                 "No scores yet!",
                 (self.window_width / 2) as i32,
                 (start_y + 100) as i32,
@@ -137,6 +146,7 @@ impl GameRenderer {
                 let text = format!("{}. {} .......... {}", i + 1, entry.name, entry.score);
                 self.text_renderer.draw_text_centered(
                     canvas,
+                    font,
                     &text,
                     (self.window_width / 2) as i32,
                     y as i32,
@@ -148,6 +158,7 @@ impl GameRenderer {
         // Controls hint
         self.text_renderer.draw_text_centered(
             canvas,
+            font,
             "[ESC] Return",
             (self.window_width / 2) as i32,
             (self.window_height - 50) as i32,

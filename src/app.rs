@@ -1,8 +1,9 @@
 use crate::audio::AudioSystem;
 use crate::config::Config;
-use crate::input_handler::{AppState, InputHandler};
+use crate::fonts::FontSystem;
 use crate::game_state::GameState;
 use crate::input::{button_to_input, keycode_to_input};
+use crate::input_handler::{AppState, InputHandler};
 use crate::leaderboard_state::LeaderboardState;
 use crate::menu_state::MenuState;
 use crate::persistence::Leaderboard;
@@ -21,6 +22,7 @@ pub struct App {
     _game_controller_subsystem: GameControllerSubsystem,
 
     // Game systems
+    fonts: FontSystem,
     audio: AudioSystem,
     menu_renderer: MenuRenderer,
     game_renderer: GameRenderer,
@@ -61,13 +63,18 @@ impl App {
             None
         };
 
-        // Initialize systems
+        // Initialize font system and load fonts
+        let fonts = FontSystem::new()?;
+
+        // Initialize audio system and load sounds
         let audio = AudioSystem::new()?;
+
+        // Initialize renderers
         let menu_renderer = MenuRenderer::new(
             config.visual.window_width,
             config.visual.window_height,
-        )?;
-        let game_renderer = GameRenderer::new(&config)?;
+        );
+        let game_renderer = GameRenderer::new(&config);
 
         // Initialize states
         let app_state = AppState::MainMenu;
@@ -82,6 +89,7 @@ impl App {
             canvas,
             event_pump,
             _game_controller_subsystem: game_controller_subsystem,
+            fonts,
             audio,
             menu_renderer,
             game_renderer,
@@ -162,11 +170,11 @@ impl App {
 
             // Render
             match self.app_state {
-                AppState::MainMenu => self.menu_renderer.render(&mut self.canvas, &self.menu_state),
-                AppState::Playing => self.game_renderer.render_game(&mut self.canvas, &self.game_state),
+                AppState::MainMenu => self.menu_renderer.render(&mut self.canvas, self.fonts.font(), &self.menu_state),
+                AppState::Playing => self.game_renderer.render_game(&mut self.canvas, self.fonts.font(), &self.game_state),
                 AppState::Leaderboard => {
                     self.game_renderer
-                        .render_leaderboard(&mut self.canvas, &self.leaderboard_state)
+                        .render_leaderboard(&mut self.canvas, self.fonts.font(), &self.leaderboard_state)
                 }
             }
 

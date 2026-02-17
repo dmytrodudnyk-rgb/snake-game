@@ -1,36 +1,52 @@
-use once_cell::sync::OnceCell;
+// Resource loading functions - pure loaders with no state management
+use sdl2::mixer::Chunk;
 use sdl2::ttf::{Font, Sdl2TtfContext};
 use std::path::Path;
 
-/// Global TTF context singleton
-static TTF_CONTEXT: OnceCell<Sdl2TtfContext> = OnceCell::new();
+// =============================================================================
+// Font Resource Loading
+// =============================================================================
 
-/// Initialize the global TTF context (must be called once at startup)
-pub fn init_ttf() -> Result<(), String> {
-    let ttf_context = sdl2::ttf::init().map_err(|e| format!("SDL2_ttf init failed: {}", e))?;
-    TTF_CONTEXT
-        .set(ttf_context)
-        .map_err(|_| "TTF context already initialized".to_string())?;
-    Ok(())
-}
-
-/// Get a reference to the global TTF context
-pub fn get_ttf_context() -> &'static Sdl2TtfContext {
-    TTF_CONTEXT
-        .get()
-        .expect("TTF context not initialized - call init_ttf() first")
-}
-
-/// Load a font from the global TTF context
-pub fn load_font(font_path: &Path, point_size: u16) -> Result<Font<'static, 'static>, String> {
-    let ttf_context = get_ttf_context();
+/// Load a font file at the specified point size
+pub fn load_font<'a>(
+    ttf_context: &'a Sdl2TtfContext,
+    font_path: &Path,
+    point_size: u16,
+) -> Result<Font<'a, 'a>, String> {
     ttf_context
         .load_font(font_path, point_size)
         .map_err(|e| format!("Failed to load font: {}", e))
 }
 
 /// Load the main game font (Press Start 2P)
-pub fn load_main_font(point_size: u16) -> Result<Font<'static, 'static>, String> {
-    let font_path = Path::new("third-party/fonts/PressStart2P.ttf");
-    load_font(font_path, point_size)
+pub fn load_main_font<'a>(ttf_context: &'a Sdl2TtfContext, point_size: u16) -> Result<Font<'a, 'a>, String> {
+    let font_path = Path::new("assets/fonts/PressStart2P.ttf");
+    if !font_path.exists() {
+        return Err(format!("Font file not found: {:?} (cwd: {:?})", font_path, std::env::current_dir()));
+    }
+    load_font(ttf_context, font_path, point_size)
+}
+
+// =============================================================================
+// Audio Resource Loading
+// =============================================================================
+
+/// Load the click sound effect
+pub fn load_click_sound() -> Result<Chunk, String> {
+    let path = "assets/sounds/click.wav";
+    if !Path::new(path).exists() {
+        return Err(format!("File not found: {} (cwd: {:?})", path, std::env::current_dir()));
+    }
+    Chunk::from_file(path)
+        .map_err(|e| format!("Failed to load click.wav: {} (cwd: {:?})", e, std::env::current_dir()))
+}
+
+/// Load the crunch sound effect
+pub fn load_crunch_sound() -> Result<Chunk, String> {
+    let path = "assets/sounds/crunch.wav";
+    if !Path::new(path).exists() {
+        return Err(format!("File not found: {} (cwd: {:?})", path, std::env::current_dir()));
+    }
+    Chunk::from_file(path)
+        .map_err(|e| format!("Failed to load crunch.wav: {} (cwd: {:?})", e, std::env::current_dir()))
 }
